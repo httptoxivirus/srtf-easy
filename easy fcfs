@@ -1,0 +1,76 @@
+#include <stdio.h>
+#define Process struct Process
+
+Process {
+    int id;         // Process ID
+    int bt;         // Burst Time
+    int art;        // Arrival Time
+    int wt;         // Waiting Time
+    int tat;        // Turnaround Time
+};
+
+void findWaitingTime(Process processes[], int n) {
+    processes[0].wt = 0; // First process has no waiting time
+
+    // Calculate waiting time for each process
+    for (int i = 1; i < n; i++) {
+        processes[i].wt = processes[i - 1].wt + processes[i - 1].bt;
+    }
+}
+
+void findTurnaroundTime(Process processes[], int n) {
+    // Calculate turnaround time for each process
+    for (int i = 0; i < n; i++) {
+        processes[i].tat = processes[i].wt + processes[i].bt;
+    }
+}
+
+void findAvgTime(Process processes[], int n) {
+    findWaitingTime(processes, n);
+    findTurnaroundTime(processes, n);
+
+    float totalWt = 0, totalTat = 0;
+
+    // Print processes and their times
+    printf("Process ID\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        totalWt += processes[i].wt;
+        totalTat += processes[i].tat;
+        printf("%d\t\t%d\t\t%d\t\t%d\t\t%d\n", 
+               processes[i].id, processes[i].bt, processes[i].art, 
+               processes[i].wt, processes[i].tat);
+    }
+
+    printf("\nAverage Waiting Time: %.2f\n", totalWt / n);
+    printf("Average Turnaround Time: %.2f\n", totalTat / n);
+}
+
+int main() {
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    Process processes[n];
+
+    // Input for processes
+    for (int i = 0; i < n; i++) {
+        processes[i].id = i + 1; // Assign process ID
+        printf("Enter burst time and arrival time for process %d: ", processes[i].id);
+        scanf("%d %d", &processes[i].bt, &processes[i].art);
+    }
+
+    // Sort processes by arrival time (bubble sort)
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (processes[j].art > processes[j + 1].art) {
+                Process temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+
+    findAvgTime(processes, n);
+
+    return 0;
+}
